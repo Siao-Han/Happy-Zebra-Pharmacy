@@ -2,7 +2,7 @@
 <html lang="zh-Hant">
 <head>
   <meta charset="UTF-8">
-  <title>領藥號顯示大螢幕</title>
+  <title>領藥號顯示大螢幕 - 投影優化版</title>
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
   <style>
@@ -22,69 +22,64 @@
       display: flex; 
       flex-direction: column; 
       align-items: center;
-      width: 98vw; /* 讓投影畫面幾乎貼邊 */
-      max-width: 1400px;
-      height: 96vh; /* 垂直方向盡量填滿 */
-      justify-content: space-between; /* 均分空間給標題、數字、提醒 */
+      width: 100vw;
+      height: 100vh;
     }
 
-    /* 投影專用標題區：扁平化以騰出更多空間給數字 */
+    /* 標題區域：拓高並將 Logo 和文字放至最大 */
     .title {
       display: flex;
       justify-content: center;
       align-items: center;
-      gap: 25px;
+      gap: 40px;
       background: #DCEDC8; 
       color: #33691E; 
       width: 100%; 
-      padding: 2vh 0; /* 使用相對高度單位 */
-      border-radius: 30px 30px 0 0; 
-      font-size: 8vh; /* 根據螢幕高度縮放 */
-      font-weight: bold;
-      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+      height: 25vh; /* 標題高度佔螢幕 1/4，顯著拓高 */
+      border-radius: 0; /* 投影幕建議直角或微圓角，填滿邊邊 */
+      font-size: 15vh; /* 文字放大到高度的 15% */
+      font-weight: 900;
+      text-align: center;
+      box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+      z-index: 2;
     }
 
     .logo {
-      height: 9vh; 
+      height: 18vh; /* Logo 同步放大 */
       width: auto;
     }
 
-    /* 投影專用數字區：極大化 */
+    /* 數字顯示區：佔據中間核心位置 */
     .screen {
-      font-size: 55vh; /* 極大號字體，佔據螢幕一半以上高度 */
+      font-size: 50vh; 
       font-weight: 900; 
       width: 100%; 
-      text-align: center;
-      background: #3E2723; 
-      color: #FFFFFF; 
-      padding: 0;
-      border-radius: 0 0 40px 40px; 
-      border: 1.5vh solid #2D1B19; 
-      border-top: none;
-      line-height: 1.1; /* 縮減行高 */
-      box-sizing: border-box;
-      flex-grow: 1; /* 自動填滿剩餘空間 */
+      flex-grow: 1; /* 彈性填滿剩餘空間 */
       display: flex;
       align-items: center;
       justify-content: center;
+      background: #3E2723; 
+      color: #FFFFFF; 
+      border: none;
+      line-height: 1;
+      box-sizing: border-box;
     }
 
-    /* 投影專用提醒文字：加粗加大，橫向延展 */
+    /* 提醒文字區塊：底部寬帶設計 */
     .announcement {
-      margin-top: 2vh;
-      font-size: 6vh; 
+      font-size: 6.5vh; 
       font-weight: bold; 
       color: #000000;
-      background: rgba(255, 255, 255, 0.6); 
-      padding: 2vh 0; 
-      border-radius: 20px; 
-      text-align: center;
+      background: rgba(255, 255, 255, 0.7); 
       width: 100%;
+      height: 12vh; /* 固定底部高度 */
+      display: flex;
+      align-items: center;
+      justify-content: center;
       box-sizing: border-box;
-      line-height: 1.2;
     }
 
-    .orange-text { color: #E65100; text-decoration: underline; } /* 投影機深橘色更清楚 */
+    .orange-text { color: #E65100; font-weight: 900; }
     .green-text { color: #1B5E20; font-weight: 900; }
   </style>
 </head>
