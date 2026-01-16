@@ -7,49 +7,40 @@
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
   <style>
     body {
-      margin: 0; 
-      height: 100vh; 
-      display: flex; 
-      justify-content: center; 
-      align-items: center;
-      background: #C3B091; 
-      color: white; 
-      font-family: "Microsoft JhengHei", Arial, sans-serif;
+      margin: 0; height: 100vh; display: flex; justify-content: center; align-items: center;
+      background: #C3B091; color: white; font-family: "Microsoft JhengHei", Arial, sans-serif;
       overflow: hidden;
     }
 
     .container {
-      display: flex; 
-      flex-direction: column; 
-      align-items: center;
-      width: 100vw;
-      height: 100vh;
+      display: flex; flex-direction: column; align-items: center;
+      width: 100vw; height: 100vh;
     }
 
-    /* 標題區域：移除 padding 讓 Logo 可以貼齊 */
+    /* 標題區域：設定為 relative 讓 Logo 可以絕對定位 */
     .title {
+      position: relative; 
       display: flex;
-      justify-content: center;
+      justify-content: center; /* 確保文字水平置中 */
       align-items: center;
-      gap: 50px;
       background: #DCEDC8; 
       color: #33691E; 
       width: 100%; 
-      height: 25vh; /* 標題高度 */
-      padding: 0;   /* 移除所有內距，讓內容能貼邊 */
-      overflow: hidden; /* 確保 Logo 邊緣乾淨 */
+      height: 25vh; 
+      padding: 0;
       font-size: 15vh; 
       font-weight: 900;
-      text-align: center;
       box-shadow: 0 10px 20px rgba(0,0,0,0.1);
       z-index: 2;
     }
 
-    /* Logo 貼齊關鍵：高度 100% */
+    /* Logo 調整：脫離文件流，向左偏移 */
     .logo {
+      position: absolute;
+      left: 5vw; /* 距離左邊 5% 的螢幕寬度，您可以根據需求調整這個數值 */
       height: 100%; 
       width: auto;
-      object-fit: contain; /* 確保 Logo 比例不變形且完整呈現 */
+      object-fit: contain;
     }
 
     /* 數字顯示區 */
@@ -63,9 +54,7 @@
       justify-content: center;
       background: #3E2723; 
       color: #FFFFFF; 
-      border: none;
       line-height: 1;
-      box-sizing: border-box;
     }
 
     /* 提醒文字區塊 */
@@ -79,7 +68,6 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      box-sizing: border-box;
     }
 
     .orange-text { color: #E65100; font-weight: 900; }
@@ -91,7 +79,7 @@
   <div class="container">
     <div class="title">
       <img src="logo.png" alt="+" class="logo"> 
-      目前領藥號
+      <span>目前領藥號</span>
     </div>
     
     <div class="screen" id="value">0</div>
