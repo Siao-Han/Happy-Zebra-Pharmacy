@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8">
+  <title>領藥號顯示大螢幕</title>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+  <style>
+    body {
+      margin: 0; height: 100vh; display: flex; justify-content: center; align-items: center;
+      background: #C3B091; color: white; font-family: "Microsoft JhengHei", Arial, sans-serif;
+      overflow: hidden; position: relative;
+    }
+    .zebra { position: absolute; width: 250px; bottom: 50px; z-index: 0; }
+    .zebra-left { left: 50px; }
+    .zebra-right { right: 50px; transform: scaleX(-1); }
+
+    .container {
+      display: flex; flex-direction: column; align-items: center;
+      width: 90%; max-width: 900px; z-index: 1;
+    }
+    .title {
+      background: #DCEDC8; color: #33691E; width: 100%; padding: 40px 0;
+      border-radius: 40px 40px 0 0; font-size: 80px; font-weight: bold; text-align: center;
+    }
+    .screen {
+      font-size: 350px; font-weight: bold; width: 100%; text-align: center;
+      background: #3E2723; color: #FFFFFF; padding: 20px 0;
+      border-radius: 0 0 50px 50px; border: 10px solid #2D1B19; border-top: none;
+    }
+    .announcement {
+      margin-top: 30px; font-size: 36px; font-weight: bold; color: #000000;
+      background: rgba(255, 255, 255, 0.5); padding: 20px; border-radius: 15px; text-align: center;
+    }
+    .orange-text { color: #FF6D00; }
+    .green-text { color: #2E7D32; }
+  </style>
+</head>
+<body>
+  <img src="https://i.giphy.com/media/v1.Y2lkPTc5MGI3NjExYTc2NjM2NWNjZmM1ZTFjYTRmNWYxODUyY2QzNDAwMGNjZTBiMzA3OCZlcD12MV9pbnRlcm5hbF9naWZzX2dpZklkJmN0PWc/oBPOP47D8m2yI/giphy.gif" class="zebra zebra-left">
+  <img src="https://i.giphy.com/media/v1.Y2lkPTc5MGI3NjExYTc2NjM2NWNjZmM1ZTFjYTRmNWYxODUyY2QzNDAwMGNjZTBiMzA3OCZlcD12MV9pbnRlcm5hbF9naWZzX2dpZklkJmN0PWc/oBPOP47D8m2yI/giphy.gif" class="zebra zebra-right">
+
+  <div class="container">
+    <div class="title">目前領藥號</div>
+    <div class="screen" id="value">0</div>
+    <div class="announcement">
+      領藥號<span class="orange-text">到號</span>或<span class="orange-text">過號</span>後，請<span class="green-text">依序排隊</span>領藥
+    </div>
+  </div>
+
+  <script>
+    const firebaseConfig = {
+      apiKey: "AIzaSyDWkmKm3TWaHXQ2CPkSJ0MBdsORiECSZ94",
+      authDomain: "siao-b8cf2.firebaseapp.com",
+      databaseURL: "https://siao-b8cf2-default-rtdb.firebaseio.com",
+      projectId: "siao-b8cf2",
+      storageBucket: "siao-b8cf2.firebasestorage.app",
+      messagingSenderId: "51378819186",
+      appId: "1:51378819186:web:35bc056d5b4c17cc12f2eb"
+    };
+    firebase.initializeApp(firebaseConfig);
+    firebase.database().ref("counter/value").on("value", (snapshot) => {
+      document.getElementById("value").innerText = snapshot.val() ?? 0;
+    });
+  </script>
+</body>
+</html>
