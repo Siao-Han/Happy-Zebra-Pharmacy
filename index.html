@@ -1,3 +1,15 @@
+沒問題！要讓 Logo 完全貼齊綠色區塊的邊緣，我們需要移除原本自動產生的間距（Padding），並將 Logo 的高度設定為與綠色區塊完全相同（100%）。
+
+我已經針對 index.html 進行了以下調整：
+
+Logo 貼齊：將 .logo 的高度設為 100%，並移除所有間距。
+
+標題優化：確保文字與貼齊邊緣的 Logo 依然維持良好的比例。
+
+請將以下程式碼覆蓋 GitHub 上的 index.html：
+
+HTML
+
 <!DOCTYPE html>
 <html lang="zh-Hant">
 <head>
@@ -26,35 +38,38 @@
       height: 100vh;
     }
 
-    /* 標題區域：拓高並將 Logo 和文字放至最大 */
+    /* 標題區域：移除 padding 讓 Logo 可以貼齊 */
     .title {
       display: flex;
       justify-content: center;
       align-items: center;
-      gap: 40px;
+      gap: 50px;
       background: #DCEDC8; 
       color: #33691E; 
       width: 100%; 
-      height: 25vh; /* 標題高度佔螢幕 1/4，顯著拓高 */
-      border-radius: 0; /* 投影幕建議直角或微圓角，填滿邊邊 */
-      font-size: 15vh; /* 文字放大到高度的 15% */
+      height: 25vh; /* 標題高度 */
+      padding: 0;   /* 移除所有內距，讓內容能貼邊 */
+      overflow: hidden; /* 確保 Logo 邊緣乾淨 */
+      font-size: 15vh; 
       font-weight: 900;
       text-align: center;
       box-shadow: 0 10px 20px rgba(0,0,0,0.1);
       z-index: 2;
     }
 
+    /* Logo 貼齊關鍵：高度 100% */
     .logo {
-      height: 18vh; /* Logo 同步放大 */
+      height: 100%; 
       width: auto;
+      object-fit: contain; /* 確保 Logo 比例不變形且完整呈現 */
     }
 
-    /* 數字顯示區：佔據中間核心位置 */
+    /* 數字顯示區 */
     .screen {
       font-size: 50vh; 
       font-weight: 900; 
       width: 100%; 
-      flex-grow: 1; /* 彈性填滿剩餘空間 */
+      flex-grow: 1; 
       display: flex;
       align-items: center;
       justify-content: center;
@@ -65,14 +80,14 @@
       box-sizing: border-box;
     }
 
-    /* 提醒文字區塊：底部寬帶設計 */
+    /* 提醒文字區塊 */
     .announcement {
       font-size: 6.5vh; 
       font-weight: bold; 
       color: #000000;
       background: rgba(255, 255, 255, 0.7); 
       width: 100%;
-      height: 12vh; /* 固定底部高度 */
+      height: 12vh; 
       display: flex;
       align-items: center;
       justify-content: center;
