@@ -1,3 +1,10 @@
+針對「橫向投影螢幕」的顯示比例，我們需要考量投影機解析度（通常是 16:9）以及遠距離觀看的舒適度。我優化了整體配置，縮減了上下留白，並讓數字與文字的比例達到最大化，確保投影出來時畫面飽滿且不切邊。
+
+index.html 投影優化版程式碼
+請複製以下代碼覆蓋 GitHub 上的 index.html：
+
+HTML
+
 <!DOCTYPE html>
 <html lang="zh-Hant">
 <head>
@@ -7,63 +14,85 @@
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
   <style>
     body {
-      margin: 0; height: 100vh; display: flex; justify-content: center; align-items: center;
-      background: #C3B091; color: white; font-family: "Microsoft JhengHei", Arial, sans-serif;
+      margin: 0; 
+      height: 100vh; 
+      display: flex; 
+      justify-content: center; 
+      align-items: center;
+      background: #C3B091; 
+      color: white; 
+      font-family: "Microsoft JhengHei", Arial, sans-serif;
       overflow: hidden;
     }
 
     .container {
-      display: flex; flex-direction: column; align-items: center;
-      width: 95%; max-width: 1200px;
+      display: flex; 
+      flex-direction: column; 
+      align-items: center;
+      width: 98vw; /* 讓投影畫面幾乎貼邊 */
+      max-width: 1400px;
+      height: 96vh; /* 垂直方向盡量填滿 */
+      justify-content: space-between; /* 均分空間給標題、數字、提醒 */
     }
 
-    /* 標題區域：字體加大，並確保 Logo 置中對齊 */
+    /* 投影專用標題區：扁平化以騰出更多空間給數字 */
     .title {
       display: flex;
       justify-content: center;
       align-items: center;
-      gap: 30px;
+      gap: 25px;
       background: #DCEDC8; 
       color: #33691E; 
       width: 100%; 
-      padding: 40px 0;
-      border-radius: 50px 50px 0 0; 
-      font-size: 100px; /* 從 80px 加大到 100px */
+      padding: 2vh 0; /* 使用相對高度單位 */
+      border-radius: 30px 30px 0 0; 
+      font-size: 8vh; /* 根據螢幕高度縮放 */
       font-weight: bold;
-      text-align: center;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
     }
 
     .logo {
-      height: 120px; /* 隨標題放大 */
+      height: 9vh; 
       width: auto;
     }
 
-    /* 數字顯示區 */
+    /* 投影專用數字區：極大化 */
     .screen {
-      font-size: 450px; /* 數字維持巨大，確保遠處可見 */
-      font-weight: bold; width: 100%; text-align: center;
-      background: #3E2723; color: #FFFFFF; padding: 10px 0;
-      border-radius: 0 0 60px 60px; border: 12px solid #2D1B19; border-top: none;
-      line-height: 1;
+      font-size: 55vh; /* 極大號字體，佔據螢幕一半以上高度 */
+      font-weight: 900; 
+      width: 100%; 
+      text-align: center;
+      background: #3E2723; 
+      color: #FFFFFF; 
+      padding: 0;
+      border-radius: 0 0 40px 40px; 
+      border: 1.5vh solid #2D1B19; 
+      border-top: none;
+      line-height: 1.1; /* 縮減行高 */
+      box-sizing: border-box;
+      flex-grow: 1; /* 自動填滿剩餘空間 */
+      display: flex;
+      align-items: center;
+      justify-content: center;
     }
 
-    /* 提醒文字區塊：字體顯著加大 */
+    /* 投影專用提醒文字：加粗加大，橫向延展 */
     .announcement {
-      margin-top: 40px; 
-      font-size: 56px; /* 從 36px 大幅增加到 56px */
+      margin-top: 2vh;
+      font-size: 6vh; 
       font-weight: bold; 
       color: #000000;
-      background: rgba(255, 255, 255, 0.5); 
-      padding: 30px 50px; 
-      border-radius: 25px; 
+      background: rgba(255, 255, 255, 0.6); 
+      padding: 2vh 0; 
+      border-radius: 20px; 
       text-align: center;
       width: 100%;
       box-sizing: border-box;
-      line-height: 1.4;
+      line-height: 1.2;
     }
 
-    .orange-text { color: #FF6D00; }
-    .green-text { color: #2E7D32; }
+    .orange-text { color: #E65100; text-decoration: underline; } /* 投影機深橘色更清楚 */
+    .green-text { color: #1B5E20; font-weight: 900; }
   </style>
 </head>
 <body>
@@ -73,9 +102,11 @@
       <img src="logo.png" alt="+" class="logo"> 
       目前領藥號
     </div>
+    
     <div class="screen" id="value">0</div>
+    
     <div class="announcement">
-      領藥號<span class="orange-text">到號</span>或<span class="orange-text">過號</span>後<br>請<span class="green-text">依序排隊</span>領藥
+      領藥號 <span class="orange-text">到號</span> 或 <span class="orange-text">過號</span> 後，請 <span class="green-text">依序排隊</span> 領藥
     </div>
   </div>
 
