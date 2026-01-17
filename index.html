@@ -17,11 +17,10 @@
       width: 100vw; height: 100vh;
     }
 
-    /* 標題區域：設定為 relative 讓 Logo 可以絕對定位 */
     .title {
       position: relative; 
       display: flex;
-      justify-content: center; /* 確保文字水平置中 */
+      justify-content: center;
       align-items: center;
       background: #DCEDC8; 
       color: #33691E; 
@@ -34,16 +33,14 @@
       z-index: 2;
     }
 
-    /* Logo 調整：脫離文件流，向左偏移 */
     .logo {
       position: absolute;
-      left: 5vw; /* 距離左邊 5% 的螢幕寬度，您可以根據需求調整這個數值 */
+      left: 5vw;/* 距離左邊 5% 的螢幕寬度，您可以根據需求調整這個數值 */
       height: 100%; 
       width: auto;
       object-fit: contain;
     }
 
-    /* 數字顯示區 */
     .screen {
       font-size: 50vh; 
       font-weight: 900; 
@@ -57,7 +54,19 @@
       line-height: 1;
     }
 
-    /* 提醒文字區塊 */
+    /* --- 新增：閃爍動畫 --- */
+    @keyframes blink-animation {
+      0% { opacity: 1; }
+      50% { opacity: 0.1; }
+      100% { opacity: 1; }
+    }
+
+    .blink {
+      /* 動態執行 0.5 秒，重複 5 次 */
+      animation: blink-animation 0.5s linear 5;
+    }
+    /* ---------------------- */
+
     .announcement {
       font-size: 6.5vh; 
       font-weight: bold; 
@@ -99,9 +108,29 @@
       messagingSenderId: "51378819186",
       appId: "1:51378819186:web:35bc056d5b4c17cc12f2eb"
     };
+    
     firebase.initializeApp(firebaseConfig);
+    
+    const valueDisplay = document.getElementById("value");
+    let isFirstLoad = true; // 用於避免網頁剛開啟時就閃爍
+
     firebase.database().ref("counter/value").on("value", (snapshot) => {
-      document.getElementById("value").innerText = snapshot.val() ?? 0;
+      const newValue = snapshot.val() ?? 0;
+      
+      // 如果不是第一次載入且數值有變動，則觸發閃爍
+      if (!isFirstLoad && valueDisplay.innerText !== String(newValue)) {
+        // 先移除 class (重置動畫)
+        valueDisplay.classList.remove("blink");
+        
+        // 觸發重繪 (Reflow)，確保移除後能重新加入動畫
+        void valueDisplay.offsetWidth; 
+        
+        // 加入閃爍 class
+        valueDisplay.classList.add("blink");
+      }
+      
+      valueDisplay.innerText = newValue;
+      isFirstLoad = false;
     });
   </script>
 </body>
