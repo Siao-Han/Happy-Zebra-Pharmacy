@@ -1,363 +1,137 @@
 <!DOCTYPE html>
-<html lang="zh-TW">
+<html lang="zh-Hant">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>領藥號控制台 - 快樂斑馬藥局</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/mqtt/5.3.5/mqtt.min.js"></script>
-    <style>
-        body {
-            background-color: #bda688;
-            font-family: "Microsoft JhengHei", sans-serif;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-            height: 100dvh;
-            margin: 0;
-            overflow: hidden;
-            user-select: none;
-            -webkit-user-select: none; 
-            padding: 10px;
-            box-sizing: border-box;
-        }
+  <meta charset="UTF-8">
+  <title>領藥號顯示大螢幕 - 投影優化版</title>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+  <style>
+    body {
+      margin: 0; height: 100vh; display: flex; justify-content: center; align-items: center;
+      background: #C3B091; color: white; font-family: "Microsoft JhengHei", Arial, sans-serif;
+      overflow: hidden;
+    }
 
-        .app-container {
-            display: grid;
-            grid-template-columns: auto 1fr auto;
-            gap: clamp(15px, 3vw, 40px);
-            align-items: center;
-            justify-items: center;
-            width: 100%;
-            max-width: 1000px;
-        }
+    .container {
+      display: flex; flex-direction: column; align-items: center;
+      width: 100vw; height: 100vh;
+    }
 
-        .grid-minus { grid-column: 1; grid-row: 1; }
-        .grid-card { grid-column: 2; grid-row: 1; width: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center; }
-        .grid-plus { grid-column: 3; grid-row: 1; }
+    .title {
+      position: relative; 
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      background: #DCEDC8; 
+      color: #33691E; 
+      width: 100%; 
+      height: 25vh; 
+      padding: 0;
+      font-size: 15vh; 
+      font-weight: 900;
+      box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+      z-index: 2;
+    }
 
-        .main-card {
-            width: 100%;
-            max-width: 600px;
-            background-color: #3e2723;
-            border-radius: clamp(20px, 4vw, 40px);
-            overflow: hidden;
-            box-shadow: 0 20px 50px rgba(0,0,0,0.4);
-            text-align: center;
-        }
+    .logo {
+      position: absolute;
+      left: 5vw;/* 距離左邊 5% 的螢幕寬度，您可以根據需求調整這個數值 */
+      height: 100%; 
+      width: auto;
+      object-fit: contain;
+    }
 
-        .header-area {
-            background-color: #e5f1e1;
-            padding: clamp(15px, 3vh, 25px) 0;
-            color: #386641;
-            font-size: clamp(32px, 5vw, 56px);
-            font-weight: 900;
-            letter-spacing: 4px;
-            border-bottom: 2px solid rgba(0,0,0,0.1);
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            gap: clamp(15px, 3vw, 25px);
-        }
+    .screen {
+      font-size: 50vh; 
+      font-weight: 900; 
+      width: 100%; 
+      flex-grow: 1; 
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: #3E2723; 
+      color: #FFFFFF; 
+      line-height: 1;
+    }
 
-        .header-logo {
-            height: clamp(65px, 10vw, 110px);
-            width: auto;
-            object-fit: contain;
-            background-color: transparent;
-            filter: drop-shadow(0 4px 6px rgba(0,0,0,0.15));
-            cursor: pointer; 
-            transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1), filter 0.2s;
-            -webkit-tap-highlight-color: transparent;
-        }
-        
-        .header-logo:hover {
-            transform: scale(1.1) rotate(-5deg);
-            filter: drop-shadow(0 8px 12px rgba(0,0,0,0.3));
-        }
-        .header-logo:active { transform: scale(0.95); }
+    /* --- 新增：閃爍動畫 --- */
+    @keyframes blink-animation {
+      0% { opacity: 1; }
+      50% { opacity: 0.1; }
+      100% { opacity: 1; }
+    }
 
-        .number-container {
-            height: clamp(150px, 35vh, 260px);
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            overflow: hidden;
-            position: relative;
-        }
+    .blink {
+      /* 動態執行 0.5 秒，重複 5 次 */
+      animation: blink-animation 0.5s linear 5;
+    }
+    /* ---------------------- */
 
-        .number-area {
-            color: white;
-            font-size: clamp(120px, 20vw, 200px);
-            font-family: 'Inter', 'Segoe UI', 'Roboto', 'Helvetica Neue', Arial, sans-serif;
-            font-weight: 600; 
-            letter-spacing: -1px;
-            line-height: 1;
-            text-shadow: 0 5px 20px rgba(0,0,0,0.3);
-            font-variant-numeric: tabular-nums;
-        }
+    .announcement {
+      font-size: 6.5vh; 
+      font-weight: bold; 
+      color: #000000;
+      background: rgba(255, 255, 255, 0.7); 
+      width: 100%;
+      height: 12vh; 
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
 
-        .footer-area {
-            background-color: #d7ccc8;
-            padding: clamp(10px, 2vh, 15px) clamp(5px, 2vw, 15px);
-            font-size: clamp(16px, 2.5vw, 24px);
-            font-weight: bold;
-            color: #333;
-            border-top: 2px solid rgba(0,0,0,0.1);
-        }
-
-        .btn-side {
-            width: clamp(80px, 12vw, 140px);
-            height: clamp(200px, 45vh, 400px);
-            background-color: #3e2723;
-            border-radius: clamp(20px, 4vw, 40px);
-            color: white;
-            font-size: clamp(50px, 8vw, 80px); 
-            font-weight: bold;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            cursor: pointer;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
-            transition: all 0.15s cubic-bezier(0.34, 1.56, 0.64, 1);
-            -webkit-tap-highlight-color: transparent;
-            touch-action: manipulation;
-            position: relative;
-            overflow: hidden;
-        }
-
-        .btn-side:active { transform: translateY(5px) scale(0.95); box-shadow: 0 5px 15px rgba(0,0,0,0.2); }
-        .btn-minus { border-bottom: clamp(6px, 1.5vh, 12px) solid #e57373; }
-        .btn-plus { border-bottom: clamp(6px, 1.5vh, 12px) solid #81c784; }
-
-        .ripple-effect {
-            position: absolute;
-            border-radius: 50%;
-            background: rgba(255, 255, 255, 0.4);
-            transform: scale(0);
-            animation: rippleAnim 0.6s linear;
-            pointer-events: none;
-        }
-
-        @keyframes rippleAnim {
-            to { transform: scale(3); opacity: 0; }
-        }
-
-        .highlight-orange { color: #f4511e; }
-        .highlight-green { color: #2e7d32; }
-
-        /* 手機直放模式優化 */
-        @media (orientation: portrait) {
-            .app-container { grid-template-columns: 1fr 1fr; gap: 15px; max-width: 600px; }
-            .grid-card { grid-column: 1 / 3; grid-row: 1; }
-            .grid-minus { grid-column: 1; grid-row: 2; }
-            .grid-plus { grid-column: 2; grid-row: 2; }
-            .btn-side { width: 100%; height: clamp(80px, 12vh, 120px); border-radius: 20px; font-size: clamp(40px, 10vw, 60px); border-bottom-width: 8px; }
-            .header-area { font-size: clamp(26px, 7vw, 40px); padding: 15px 10px; gap: 12px; }
-            .header-logo { height: clamp(80px, 18vw, 120px); }
-        }
-
-        /* 橫放扁平螢幕優化 */
-        @media (orientation: landscape) and (max-height: 500px) {
-            .app-container { transform: translateY(-5vh); }
-            .header-area { font-size: clamp(24px, 7vh, 36px); padding: 8px 0; gap: 15px; }
-            .number-container { height: clamp(90px, 40vh, 140px); }
-            .number-area { font-size: clamp(80px, 40vh, 120px); }
-            .footer-area { font-size: clamp(12px, 3.5vh, 16px); padding: 6px; }
-            .header-logo { height: clamp(50px, 15vh, 80px); }
-            .btn-side { height: clamp(100px, 50vh, 180px); border-bottom-width: 6px; }
-        }
-        
-        #connectionStatus {
-            position: fixed;
-            bottom: 12px;
-            right: 15px;
-            font-size: 12px;
-            color: rgba(255,255,255,0.8);
-            z-index: 100;
-            background: rgba(0,0,0,0.5);
-            padding: 6px 12px;
-            border-radius: 8px;
-            text-align: right;
-            backdrop-filter: blur(4px);
-            box-shadow: 0 2px 10px rgba(0,0,0,0.2);
-        }
-    </style>
+    .orange-text { color: #E65100; font-weight: 900; }
+    .green-text { color: #1B5E20; font-weight: 900; }
+  </style>
 </head>
 <body>
 
-    <div class="app-container">
-        <!-- 減號按鈕 -->
-        <div id="btnMinus" class="grid-minus btn-side btn-minus" onclick="changeNumber(-1)"> - </div>
-        
-        <div class="grid-card">
-            <div class="main-card">
-                <div class="header-area">
-                    <img src="logo.png" alt="Logo" class="header-logo" id="zebraLogo" title="點擊斑馬歸零" onclick="confirmReset()" onerror="this.src='logo.jpg'; this.onerror=null;">
-                    <span>控制台目前號碼</span>
-                </div>
-                <div class="number-container">
-                    <div id="numberDisplay" class="number-area">0</div>
-                </div>
-                <div class="footer-area">
-                    連動更新大螢幕：<span class="highlight-orange">請按左右側按鈕</span>
-                </div>
-            </div>
-            <!-- 電腦版快捷鍵提示 -->
-            <div class="mt-6 text-[#7a6452] text-sm font-bold tracking-widest hidden md:block drop-shadow-sm relative group cursor-help w-full max-w-[400px]">
-                <div class="opacity-70 group-hover:opacity-0 transition-opacity duration-300 absolute w-full text-center pointer-events-none">
-                    <i class="fa-regular fa-keyboard mr-1"></i> 快捷鍵說明
-                </div>
-                <div class="opacity-0 group-hover:opacity-100 transition-opacity duration-300 text-center">
-                    [→] 加一號 / [←] 減一號 / 點擊斑馬歸零
-                </div>
-            </div>
-        </div>
-        
-        <!-- 加號按鈕 -->
-        <div id="btnPlus" class="grid-plus btn-side btn-plus" onclick="changeNumber(1)"> + </div>
+  <div class="container">
+    <div class="title">
+      <img src="logo.png" alt="+" class="logo"> 
+      <span>目前領藥號</span>
     </div>
     
-    <div id="connectionStatus">
-        <span id="syncIdDisplay">連線中...</span><br>
-        <span id="statusText">等待伺服器回應...</span>
+    <div class="screen" id="value">0</div>
+    
+    <div class="announcement">
+      領藥號 <span class="orange-text">到號</span> 或 <span class="orange-text">過號</span> 後，請 <span class="green-text">依序排隊</span> 領藥
     </div>
+  </div>
 
-    <script>
-        // ========================================================
-        // 控制台核心邏輯 (移除聲音，發送訊號)
-        // ========================================================
-        let currentNumber = parseInt(localStorage.getItem('happyZebraBasicNumber')) || 0;
-        let client = null; 
-        const topic = "happy-zebra-queue-sync-alan001006003"; // 必須與 index.html 相同
-        const clientId = 'admin_' + Math.random().toString(16).substr(2, 8);
+  <script>
+    const firebaseConfig = {
+      apiKey: "AIzaSyDWkmKm3TWaHXQ2CPkSJ0MBdsORiECSZ94",
+      authDomain: "siao-b8cf2.firebaseapp.com",
+      databaseURL: "https://siao-b8cf2-default-rtdb.firebaseio.com",
+      projectId: "siao-b8cf2",
+      storageBucket: "siao-b8cf2.firebasestorage.app",
+      messagingSenderId: "51378819186",
+      appId: "1:51378819186:web:35bc056d5b4c17cc12f2eb"
+    };
+    
+    firebase.initializeApp(firebaseConfig);
+    
+    const valueDisplay = document.getElementById("value");
+    let isFirstLoad = true; // 用於避免網頁剛開啟時就閃爍
 
-        const display = document.getElementById('numberDisplay');
-        const statusText = document.getElementById('statusText');
-        const syncIdDisplay = document.getElementById('syncIdDisplay');
+    firebase.database().ref("counter/value").on("value", (snapshot) => {
+      const newValue = snapshot.val() ?? 0;
+      
+      // 如果不是第一次載入且數值有變動，則觸發閃爍
+      if (!isFirstLoad && valueDisplay.innerText !== String(newValue)) {
+        // 先移除 class (重置動畫)
+        valueDisplay.classList.remove("blink");
         
-        function updateUI() {
-            display.innerText = currentNumber;
-        }
-
-        window.changeNumber = function(delta) {
-            currentNumber = Math.max(0, currentNumber + delta);
-            updateUI();
-            localStorage.setItem('happyZebraBasicNumber', currentNumber);
-            
-            // 發送指令給大螢幕
-            try {
-                if(client && client.connected) {
-                    client.publish(topic, JSON.stringify({ sender: clientId, number: currentNumber }), { retain: true });
-                }
-            } catch(e) { console.log("雲端同步暫時不可用"); }
-        }
-
-        window.confirmReset = function() {
-            if (currentNumber === 0) return; 
-            if (confirm("確定要將目前的領藥號碼歸零嗎？")) {
-                currentNumber = 0;
-                updateUI();
-                localStorage.setItem('happyZebraBasicNumber', currentNumber);
-                
-                try {
-                    if(client && client.connected) {
-                        client.publish(topic, JSON.stringify({ sender: clientId, number: 0 }), { retain: true });
-                    }
-                } catch(e) {}
-            }
-        }
-
-        // 綁定按鈕水波紋特效
-        function bindRippleEffects() {
-            const btnMinus = document.getElementById('btnMinus');
-            const btnPlus = document.getElementById('btnPlus');
-            
-            const addRipple = (element) => {
-                element.addEventListener('pointerdown', function(e) {
-                    if (navigator.vibrate) navigator.vibrate(15);
-                    const circle = document.createElement("span");
-                    const diameter = Math.max(element.clientWidth, element.clientHeight);
-                    const radius = diameter / 2;
-                    const rect = element.getBoundingClientRect();
-                    
-                    circle.style.width = circle.style.height = `${diameter}px`;
-                    circle.style.left = `${e.clientX - rect.left - radius}px`;
-                    circle.style.top = `${e.clientY - rect.top - radius}px`;
-                    circle.classList.add("ripple-effect");
-
-                    const existingRipple = element.querySelector('.ripple-effect');
-                    if (existingRipple) existingRipple.remove();
-
-                    element.appendChild(circle);
-                    setTimeout(() => circle.remove(), 600);
-                });
-            };
-
-            addRipple(btnMinus);
-            addRipple(btnPlus);
-
-            // 鍵盤綁定
-            document.addEventListener('keydown', (e) => {
-                if (e.repeat) return;
-                switch(e.key) {
-                    case 'ArrowRight': case '+': changeNumber(1); break;
-                    case 'ArrowLeft': case '-': changeNumber(-1); break;
-                    case 'Backspace': case 'Delete': confirmReset(); break;
-                }
-            });
-        }
-
-        window.addEventListener('DOMContentLoaded', () => {
-            updateUI(); 
-            bindRippleEffects();
-        });
-
-        // ========================================================
-        // 雲端同步連線
-        // ========================================================
-        try {
-            if (typeof mqtt !== 'undefined') {
-                client = mqtt.connect('wss://broker.hivemq.com:8884/mqtt', {
-                    clientId: clientId,
-                    clean: true,
-                    connectTimeout: 5000,
-                    reconnectPeriod: 3000,
-                });
-
-                client.on('connect', () => {
-                    syncIdDisplay.innerText = "控制台已就緒";
-                    statusText.innerText = "● 雲端發送端連線成功";
-                    statusText.style.color = "#81c784"; 
-                    client.subscribe(topic);
-                });
-
-                client.on('reconnect', () => {
-                    statusText.innerText = "重新連線中...";
-                    statusText.style.color = "#e57373"; 
-                });
-
-                // 接收其他控制台的訊號 (若有多台手機同時當控制台)
-                client.on('message', (t, message) => {
-                    if (t === topic) {
-                        try {
-                            const data = JSON.parse(message.toString());
-                            if (data.sender !== clientId) {
-                                currentNumber = data.number;
-                                updateUI();
-                                localStorage.setItem('happyZebraBasicNumber', currentNumber);
-                            }
-                        } catch(e) {}
-                    }
-                });
-            } else {
-                statusText.innerText = "連線套件載入失敗";
-            }
-        } catch (error) {
-            statusText.innerText = "網路環境限制無法連線";
-        }
-    </script>
+        // 觸發重繪 (Reflow)，確保移除後能重新加入動畫
+        void valueDisplay.offsetWidth; 
+        
+        // 加入閃爍 class
+        valueDisplay.classList.add("blink");
+      }
+      
+      valueDisplay.innerText = newValue;
+      isFirstLoad = false;
+    });
+  </script>
 </body>
 </html>
