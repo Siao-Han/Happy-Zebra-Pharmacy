@@ -2,13 +2,13 @@
 <html lang="zh-Hant">
 <head>
   <meta charset="UTF-8">
-  <title>領藥號顯示大螢幕 - 投影優化版</title>
+  <title>領藥號顯示大螢幕 - 快樂斑馬藥局</title>
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
   <style>
     body {
       margin: 0; height: 100vh; display: flex; justify-content: center; align-items: center;
-      background: #C3B091; color: white; font-family: "Microsoft JhengHei", Arial, sans-serif;
+      background: #C3B091; color: white; font-family: "Microsoft JhengHei", "PingFang TC", Arial, sans-serif;
       overflow: hidden;
     }
 
@@ -35,14 +35,14 @@
 
     .logo {
       position: absolute;
-      left: 5vw;/* 距離左邊 5% 的螢幕寬度，您可以根據需求調整這個數值 */
-      height: 100%; 
+      left: 5vw;
+      height: 80%; 
       width: auto;
       object-fit: contain;
     }
 
     .screen {
-      font-size: 50vh; 
+      font-size: 55vh; 
       font-weight: 900; 
       width: 100%; 
       flex-grow: 1; 
@@ -54,24 +54,22 @@
       line-height: 1;
     }
 
-    /* --- 新增：閃爍動畫 --- */
+    /* --- 閃爍動畫 --- */
     @keyframes blink-animation {
       0% { opacity: 1; }
-      50% { opacity: 0.1; }
+      50% { opacity: 0.2; }
       100% { opacity: 1; }
     }
 
     .blink {
-      /* 動態執行 0.5 秒，重複 5 次 */
       animation: blink-animation 0.5s linear 5;
     }
-    /* ---------------------- */
 
     .announcement {
       font-size: 6.5vh; 
       font-weight: bold; 
       color: #000000;
-      background: rgba(255, 255, 255, 0.7); 
+      background: rgba(255, 255, 255, 0.8); 
       width: 100%;
       height: 12vh; 
       display: flex;
@@ -87,7 +85,7 @@
 
   <div class="container">
     <div class="title">
-      <img src="logo.png" alt="+" class="logo"> 
+      <img src="logo.png" alt="Logo" class="logo"> 
       <span>目前領藥號</span>
     </div>
     
@@ -99,6 +97,7 @@
   </div>
 
   <script>
+    // Firebase 配置 (與您的 Admin 端完全一致)
     const firebaseConfig = {
       apiKey: "AIzaSyDWkmKm3TWaHXQ2CPkSJ0MBdsORiECSZ94",
       authDomain: "siao-b8cf2.firebaseapp.com",
@@ -112,20 +111,16 @@
     firebase.initializeApp(firebaseConfig);
     
     const valueDisplay = document.getElementById("value");
-    let isFirstLoad = true; // 用於避免網頁剛開啟時就閃爍
+    let isFirstLoad = true; 
 
+    // 監聽路徑 counter/value
     firebase.database().ref("counter/value").on("value", (snapshot) => {
       const newValue = snapshot.val() ?? 0;
       
-      // 如果不是第一次載入且數值有變動，則觸發閃爍
+      // 數值有變動時觸發閃爍 (排除第一次載入)
       if (!isFirstLoad && valueDisplay.innerText !== String(newValue)) {
-        // 先移除 class (重置動畫)
         valueDisplay.classList.remove("blink");
-        
-        // 觸發重繪 (Reflow)，確保移除後能重新加入動畫
-        void valueDisplay.offsetWidth; 
-        
-        // 加入閃爍 class
+        void valueDisplay.offsetWidth; // 觸發重繪以重啟動畫
         valueDisplay.classList.add("blink");
       }
       
